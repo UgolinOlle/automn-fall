@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Send, CheckCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '~/components/ui/button'
@@ -14,20 +14,69 @@ export const Appointment: React.FC<{ className?: string }> = ({
   // --- Variables
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
   const [buttonWidth, setButtonWidth] = useState(0)
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const menuVariants = {
     closed: {
       opacity: 0,
       y: -10,
-      transition: { duration: 0.2 },
+      transition: { duration: 0.2, when: 'afterChildren' },
     },
     open: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.2 },
+      transition: {
+        duration: 0.2,
+        when: 'beforeChildren',
+        staggerChildren: 0.1,
+      },
     },
+  }
+
+  const itemVariants = {
+    closed: (i: number) => ({
+      opacity: 0,
+      y: -20,
+      transition: {
+        delay: i * 0.1,
+        duration: 0.2,
+      },
+    }),
+    open: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.1,
+        duration: 0.2,
+      },
+    }),
+  }
+
+  const planeVariants = {
+    initial: { x: 0, y: 0, opacity: 0 },
+    animate: {
+      x: 70,
+      y: -70,
+      opacity: [0, 1, 0],
+      transition: {
+        duration: 1.5,
+        times: [0, 0.2, 1],
+        ease: 'easeInOut',
+      },
+    },
+  }
+
+  const successVariants = {
+    hidden: { x: -20, opacity: 0 },
+    visible: { x: 0, opacity: 1, transition: { duration: 0.3 } },
+  }
+
+  const loadingVariants = {
+    hidden: { x: 0, opacity: 1 },
+    exit: { x: 20, opacity: 0, transition: { duration: 0.3 } },
   }
 
   // --- Effects
@@ -46,6 +95,25 @@ export const Appointment: React.FC<{ className?: string }> = ({
     }
   }, [])
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isOpen &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen])
+
   // --- Functions
   const toggleMenu = () => setIsOpen(!isOpen)
 
@@ -53,8 +121,12 @@ export const Appointment: React.FC<{ className?: string }> = ({
     setIsLoading(true)
     setTimeout(() => {
       setIsLoading(false)
-      setIsOpen(false)
-      toast.success('Inscription réussie !')
+      setIsSuccess(true)
+      setTimeout(() => {
+        setIsSuccess(false)
+        setIsOpen(false)
+        toast.success('Inscription réussie !')
+      }, 1500) // Durée de l'animation de l'avion
     }, 2000)
   }
 
@@ -63,7 +135,7 @@ export const Appointment: React.FC<{ className?: string }> = ({
     <div className={cn(`inline-block text-left`, className)}>
       <Button
         ref={buttonRef}
-        className="text-md rounded-xl py-5 font-bold"
+        className="text-md rounded-xl font-bold"
         onClick={toggleMenu}
         aria-haspopup="true"
         aria-expanded={isOpen}
@@ -74,6 +146,7 @@ export const Appointment: React.FC<{ className?: string }> = ({
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            ref={menuRef}
             className="absolute mt-2"
             style={{ width: `${buttonWidth}px` }}
             initial="closed"
@@ -82,27 +155,69 @@ export const Appointment: React.FC<{ className?: string }> = ({
             variants={menuVariants}
           >
             <div
-              className="rounded-xl bg-primary/50 py-2"
+              className="rounded-xl bg-primary/25 py-2"
               role="menu"
               aria-orientation="vertical"
               aria-labelledby="options-menu"
             >
-              <Button
-                className="mx-2 flex w-[calc(100%-16px)] justify-start rounded-xl bg-transparent py-5 text-sm font-bold shadow-none duration-300 hover:bg-primary"
-                role="menuitem"
-                onClick={() => console.log('Enregistré sur iCloud')}
-              >
-                Enregistrer sur iCloud
-              </Button>
-              <Button
-                className="mx-2 flex w-[calc(100%-16px)] justify-start rounded-xl bg-transparent py-5 text-sm font-bold shadow-none duration-300 hover:bg-primary"
-                role="menuitem"
-                onClick={handleSignUp}
-                disabled={isLoading}
-              >
-                {isLoading && <Loader2 className="mr-3 h-5 w-5 animate-spin" />}
-                {isLoading ? 'Inscription en cours...' : 'News Letter'}
-              </Button>
+              <motion.div custom={0} variants={itemVariants}>
+                <Button
+                  className="mx-2 flex w-[calc(100%-16px)] justify-start rounded-lg bg-transparent text-sm font-bold shadow-none hover:bg-primary"
+                  role="menuitem"
+                  onClick={() => console.log('Enregistré sur iCloud')}
+                >
+                  Enregistrer sur iCloud
+                </Button>
+              </motion.div>
+              <motion.div custom={1} variants={itemVariants}>
+                <Button
+                  className="mx-2 flex w-[calc(100%-16px)] justify-start rounded-lg bg-transparent text-sm font-bold shadow-none hover:bg-primary"
+                  role="menuitem"
+                  onClick={handleSignUp}
+                  disabled={isLoading || isSuccess}
+                >
+                  {isSuccess && (
+                    <motion.div
+                      className="absolute inset-0 z-10 flex items-center justify-center"
+                      initial="initial"
+                      animate="animate"
+                      variants={planeVariants}
+                    >
+                      <Send className="text-primary" size={18} />
+                    </motion.div>
+                  )}
+                  <AnimatePresence mode="wait">
+                    {isLoading && (
+                      <motion.div
+                        key="loading"
+                        className="flex items-center"
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        variants={loadingVariants}
+                      >
+                        <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                        Inscription en cours...
+                      </motion.div>
+                    )}
+                    {isSuccess && (
+                      <motion.div
+                        key="success"
+                        className="flex items-center"
+                        initial="hidden"
+                        animate="visible"
+                        variants={successVariants}
+                      >
+                        <CheckCircle className="mr-2 text-primary" size={18} />
+                        Inscription réussie !
+                      </motion.div>
+                    )}
+                    {!isLoading && !isSuccess && (
+                      <motion.div key="default">List d'attente</motion.div>
+                    )}
+                  </AnimatePresence>
+                </Button>
+              </motion.div>
             </div>
           </motion.div>
         )}
