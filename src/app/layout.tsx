@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import './globals.css'
 import { Author } from '~/components/common/author'
+import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
   title: 'Automn Fall · Ugolin Olle',
@@ -18,6 +19,7 @@ export default function RootLayout({
       <body
         className={`relative m-auto h-full max-w-2xl bg-hero-pattern bg-cover px-4 antialiased`}
       >
+        <Toaster richColors position="bottom-center" />
         {children}
         <Author />
       </body>

@@ -1,3 +1,4 @@
+import { Appointment } from '~/components/common/appointement'
 import { Heading } from '~/components/ui/heading'
 
 /**
@@ -13,6 +14,7 @@ export default function Home() {
         Automn Fall
       </Heading>
       <span className="italic text-secondary">Made by Ugolin OLLE with ❤️</span>
+      <Appointment className="mt-12" />
     </div>
   )
 }
