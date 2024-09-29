@@ -11,6 +11,7 @@ const config: Config = {
     extend: {
       backgroundImage: {
         'hero-pattern': 'url("/assets/automn-fall-bg.jpg")',
+        'hero-no-pattern': 'url("/assets/automn-fall-no-bg.png")',
         'leaf-pattern': 'url("/assets/automn-leaf.jpg")',
       },
       colors: {

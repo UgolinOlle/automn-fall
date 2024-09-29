@@ -4,11 +4,8 @@ import { Toaster } from 'sonner'
 import './globals.css'
 import { Author } from '~/components/common/author'
 import { Navbar } from '~/components/common/navbar'
-import {
-  AnimatedCloud,
-  AnimatedCloud2,
-} from '~/components/common/animated-cloud'
 import { Cursor } from '~/components/common/cursor'
+import { CloudScene } from '~/components/common/cloud-scene'
 
 export const metadata: Metadata = {
   title: 'Automn Fall · Ugolin Olle',
@@ -22,9 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`relative m-auto h-full max-w-2xl bg-hero-pattern bg-cover px-4 antialiased`}
-      >
+      <body className={`relative bg-hero-pattern bg-cover antialiased`}>
         <Toaster
           position="bottom-center"
           toastOptions={{
@@ -36,8 +31,7 @@ export default function RootLayout({
           }}
         />
         <Cursor />
-        <AnimatedCloud />
-        <AnimatedCloud2 />
+        <CloudScene />
         <Navbar />
         {children}
         <Author />

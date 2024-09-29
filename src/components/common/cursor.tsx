@@ -66,7 +66,7 @@ export const Cursor = () => {
         }
       `}</style>
       <motion.div
-        className="pointer-events-none fixed left-0 top-0 z-50"
+        className="pointer-events-none fixed left-0 top-0 z-[10001]"
         animate={{
           x: mousePosition.x,
           y: mousePosition.y,
