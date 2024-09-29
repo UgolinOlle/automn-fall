@@ -23,36 +23,15 @@ export const Appointment: React.FC<{ className?: string }> = ({
     closed: {
       opacity: 0,
       y: -10,
-      transition: { duration: 0.2, when: 'afterChildren' },
+      transition: { duration: 0.1 },
     },
     open: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.2,
-        when: 'beforeChildren',
-        staggerChildren: 0.1,
+        duration: 0.1,
       },
     },
-  }
-
-  const itemVariants = {
-    closed: (i: number) => ({
-      opacity: 0,
-      y: -20,
-      transition: {
-        delay: i * 0.1,
-        duration: 0.2,
-      },
-    }),
-    open: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: i * 0.1,
-        duration: 0.2,
-      },
-    }),
   }
 
   const planeVariants = {
@@ -135,7 +114,7 @@ export const Appointment: React.FC<{ className?: string }> = ({
     <div className={cn(`inline-block text-left`, className)}>
       <Button
         ref={buttonRef}
-        className="text-md rounded-xl font-bold"
+        className="text-md rounded-xl font-bold shadow-inner shadow-secondary"
         onClick={toggleMenu}
         aria-haspopup="true"
         aria-expanded={isOpen}
@@ -155,21 +134,21 @@ export const Appointment: React.FC<{ className?: string }> = ({
             variants={menuVariants}
           >
             <div
-              className="rounded-xl bg-primary/25 py-2"
+              className="rounded-xl bg-primary py-2 shadow-inner shadow-secondary"
               role="menu"
               aria-orientation="vertical"
               aria-labelledby="options-menu"
             >
-              <motion.div custom={0} variants={itemVariants}>
+              <motion.div>
                 <Button
-                  className="mx-2 flex w-[calc(100%-16px)] justify-start rounded-lg bg-transparent text-sm font-bold shadow-none hover:bg-primary"
+                  className="w-[calc(100%-16px)]rounded-lg mx-2 bg-transparent text-sm font-bold shadow-none"
                   role="menuitem"
                   onClick={() => console.log('Enregistré sur iCloud')}
                 >
                   Enregistrer sur iCloud
                 </Button>
               </motion.div>
-              <motion.div custom={1} variants={itemVariants}>
+              <motion.div>
                 <Button
                   className="mx-2 flex w-[calc(100%-16px)] justify-start rounded-lg bg-transparent text-sm font-bold shadow-none hover:bg-primary"
                   role="menuitem"
@@ -183,7 +162,7 @@ export const Appointment: React.FC<{ className?: string }> = ({
                       animate="animate"
                       variants={planeVariants}
                     >
-                      <Send className="text-primary" size={18} />
+                      <Send className="text-secondary" size={18} />
                     </motion.div>
                   )}
                   <AnimatePresence mode="wait">
@@ -196,19 +175,25 @@ export const Appointment: React.FC<{ className?: string }> = ({
                         exit="exit"
                         variants={loadingVariants}
                       >
-                        <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                        <Loader2
+                          className="mr-3 animate-spin text-secondary"
+                          size={18}
+                        />
                         Inscription en cours...
                       </motion.div>
                     )}
                     {isSuccess && (
                       <motion.div
                         key="success"
-                        className="flex items-center"
+                        className="flex items-center text-neutral-100"
                         initial="hidden"
                         animate="visible"
                         variants={successVariants}
                       >
-                        <CheckCircle className="mr-2 text-primary" size={18} />
+                        <CheckCircle
+                          className="mr-3 text-secondary"
+                          size={18}
+                        />
                         Inscription réussie !
                       </motion.div>
                     )}
