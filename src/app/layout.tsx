@@ -6,6 +6,7 @@ import { Author } from '~/components/common/author'
 import { Navbar } from '~/components/common/navbar'
 import { Cursor } from '~/components/common/cursor'
 import { CloudScene } from '~/components/common/cloud-scene'
+import { StickersScene } from '~/components/common/stickers-scene'
 
 export const metadata: Metadata = {
   title: 'Automn Fall · Ugolin Olle',
@@ -32,6 +33,7 @@ export default function RootLayout({
         />
         <Cursor />
         <CloudScene />
+        <StickersScene />
         <Navbar />
         {children}
         <Author />

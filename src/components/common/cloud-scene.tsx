@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { Canvas, useFrame, useLoader } from '@react-three/fiber'
 import { TextureLoader } from 'three'
 import { OrbitControls } from '@react-three/drei'
@@ -10,7 +10,6 @@ import { OrbitControls } from '@react-three/drei'
  * @description A floating cloud that moves from right to left and can be dragged around.
  */
 const FloatingCloud: React.FC = () => {
-  // --- Variables
   const cloudRef = useRef<any>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({
@@ -21,11 +20,22 @@ const FloatingCloud: React.FC = () => {
     x: 8,
     y: 3,
   })
-  const [targetOpacity, setTargetOpacity] = useState(0.1)
-  const [currentOpacity, setCurrentOpacity] = useState(0.1)
+  const [targetOpacity, setTargetOpacity] = useState(0.2)
+  const [currentOpacity, setCurrentOpacity] = useState(0.2)
+  const [windowWidth, setWindowWidth] = useState<number>(
+    window.innerWidth / 100
+  )
   const cloudTexture = useLoader(TextureLoader, '/assets/cloud.webp')
 
   // --- Functions
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth / 100)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   useFrame((state) => {
     if (cloudRef.current) {
       const opacityDiff = targetOpacity - currentOpacity
@@ -55,19 +65,18 @@ const FloatingCloud: React.FC = () => {
 
       position.needsUpdate = true
 
-      if (isDragging) {
-        cloudRef.current.rotation.z = Math.sin(time * 2) * 0.05
+      // Stop the cloud movement when dragging
+      if (!isDragging) {
+        setCloudPosition((prevPosition) => {
+          const newX = prevPosition.x - 0.02
+          if (newX < -windowWidth * 5) {
+            return { ...prevPosition, x: windowWidth * 5 }
+          }
+          return { ...prevPosition, x: newX }
+        })
+
+        cloudRef.current.position.x = cloudPosition.x
       }
-
-      setCloudPosition((prevPosition) => {
-        const newX = prevPosition.x - 0.01
-        if (newX < -5) {
-          return { ...prevPosition, x: 5 }
-        }
-        return { ...prevPosition, x: newX }
-      })
-
-      cloudRef.current.position.x = cloudPosition.x
     }
   })
 
@@ -94,11 +103,11 @@ const FloatingCloud: React.FC = () => {
   }
 
   const onPointerOver = () => {
-    setTargetOpacity(1)
+    setTargetOpacity(0.5)
   }
 
   const onPointerOut = () => {
-    setTargetOpacity(0.5)
+    setTargetOpacity(0.1)
   }
 
   // --- Render
@@ -112,7 +121,7 @@ const FloatingCloud: React.FC = () => {
       onPointerOver={onPointerOver}
       onPointerOut={onPointerOut}
     >
-      <planeGeometry args={[5, 3, 32, 32]} />
+      <planeGeometry args={[5, 3, 32, 32]} />{' '}
       <meshBasicMaterial
         map={cloudTexture}
         transparent
@@ -128,7 +137,6 @@ const FloatingCloud: React.FC = () => {
  * @exports CloudScene
  */
 export const CloudScene: React.FC = () => {
-  // --- Render
   return (
     <div
       style={{
@@ -149,3 +157,5 @@ export const CloudScene: React.FC = () => {
     </div>
   )
 }
+
+export default CloudScene
