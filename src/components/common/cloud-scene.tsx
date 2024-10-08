@@ -51,12 +51,12 @@ const FloatingCloud: React.FC = () => {
       for (let i = 0; i < position.count; i++) {
         const x = position.getX(i)
         const y = position.getY(i)
-        const waveX = Math.sin(time + x * 2) * 0.02
-        const waveY = Math.sin(time + y * 2) * 0.02
+        const waveX = Math.sin(time + x * 2) * 0.01 // Reduced wave speed
+        const waveY = Math.sin(time + y * 2) * 0.01 // Reduced wave speed
 
         if (isDragging) {
-          const dragWaveX = Math.sin(time * 5 + x * 10) * 0.1
-          const dragWaveY = Math.cos(time * 5 + y * 10) * 0.1
+          const dragWaveX = Math.sin(time * 5 + x * 10) * 0.05 // Reduced drag wave speed
+          const dragWaveY = Math.cos(time * 5 + y * 10) * 0.05 // Reduced drag wave speed
           position.setZ(i, waveX + waveY + dragWaveX + dragWaveY)
         } else {
           position.setZ(i, waveX + waveY)
@@ -68,7 +68,7 @@ const FloatingCloud: React.FC = () => {
       // Stop the cloud movement when dragging
       if (!isDragging) {
         setCloudPosition((prevPosition) => {
-          const newX = prevPosition.x - 0.02
+          const newX = prevPosition.x - 0.01 // Reduced movement speed
           if (newX < -windowWidth * 5) {
             return { ...prevPosition, x: windowWidth * 5 }
           }
@@ -115,13 +115,16 @@ const FloatingCloud: React.FC = () => {
     <mesh
       ref={cloudRef}
       position={[cloudPosition.x, cloudPosition.y, 0]}
-      onPointerDown={onPointerDown}
+      onPointerDown={(e) => {
+        e.stopPropagation() // Allow cloud selection
+        onPointerDown(e)
+      }}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerOver={onPointerOver}
       onPointerOut={onPointerOut}
     >
-      <planeGeometry args={[5, 3, 32, 32]} />{' '}
+      <planeGeometry args={[5, 3, 32, 32]} />
       <meshBasicMaterial
         map={cloudTexture}
         transparent
